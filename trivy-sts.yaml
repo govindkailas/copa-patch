@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: trivy
+  namespace: security
+spec:
+  serviceName: trivy
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trivy
+  template:
+    metadata:
+      labels:
+        app: trivy
+    spec:
+      containers:
+      - name: trivy
+        image: aquasec/trivy:latest
+        # Add any necessary resource limits here
+        command: ["/usr/local/bin/trivy"]
+        args: ["server", "--listen", "0.0.0.0:4954"]
+        ports:
+        - containerPort: 4954
+          name: trivy-server
+  volumeClaimTemplates:
+  - metadata:
+      name: trivy-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
