@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: copa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: copa
+  template:
+    metadata:
+      labels:
+        app: copa
+    spec:
+      containers:
+        - name: copa
+          image: ghcr.io/project-copacetic/copa-action:v0.6.2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: TRIVY_SERVER_URL
+              value: "http://trivy.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: copa
+spec:
+  selector:
+    app: copa
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP

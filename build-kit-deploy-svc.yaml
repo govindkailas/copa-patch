@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: buildkit
-  namespace: build 
 spec:
   replicas: 1
   selector:
@@ -14,23 +13,29 @@ spec:
         app: buildkit
     spec:
       containers:
-      - name: buildkitd
-        image: moby/buildkit:latest
-        command: 
-          - "/bin/sh"
-          - "-c"
-          - |
-            buildkitd --addr tcp://0.0.0.0:1234 &
-            wait
-        ports:
-        - containerPort: 1234
-          name: buildkit
+        - name: buildkitd
+          image: moby/buildkit:latest
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              buildkitd --addr tcp://0.0.0.0:1234 &
+              wait
+          ports:
+            - containerPort: 1234
+              name: buildkit
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: buildkit
-  namespace: build
 spec:
   selector:
     app: buildkit

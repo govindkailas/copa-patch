@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: trivy
-  namespace: security
 spec:
   serviceName: trivy
   replicas: 1
@@ -31,3 +30,17 @@ spec:
       resources:
         requests:
           storage: 10Gi
+---
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trivy
+spec:
+  selector:
+    app: trivy
+  ports:
+  - port: 4954
+    targetPort: 4954
+  type: ClusterIP
